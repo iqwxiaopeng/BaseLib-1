@@ -15,12 +15,12 @@ namespace detail
 {
     __thread pid_t t_tid = 0;
 
-    pid_t gettid()
+    pid_t Gettid()
     {
         return static_cast<pid_t>(::syscall(__NR_gettid));
     }
 
-    void afterFork()
+    void AfterFork()
     {
         t_tid = gettid();
         ACache::CurrentThread::t_name = "main";
@@ -40,10 +40,10 @@ namespace detail
 }
 }//multiThread
 
-using namespace ACache;
-using namespace ACache::detail;
+using namespace BaseLib;
+using namespace BaseLib::detail;
 
-pid_t CurrentThread::tid()
+pid_t CurrentThread::Tid()
 {
     if(t_tid == 0)
     {
@@ -52,53 +52,53 @@ pid_t CurrentThread::tid()
     return t_tid;
 }
 
-const char* CurrentThread::name()
+const char* CurrentThread::Name()
 {
     return t_name;
 }
 
-bool CurrentThread::isMainThread()
+bool CurrentThread::IsMainThread()
 {
     return tid() == ::getpid();
 }
 
-atomic_int Thread::totalThrdM;
+atomic_int Thread::TotalThrd_;
 
 Thread::Thread(const ThreadFunc& func, const string& n)
-:startedM(false),
- thrdIdM(0),
- pidM(0),
- funcM(func),
- nameM(n)
+:started_(false),
+ thrdId_(0),
+ pid_(0),
+ func_(func),
+ name_(n)
 {
 }
 
-void Thread::start()
+void Thread::Start()
 {
-    assert(!startedM);
-    startedM = true;
-    pthread_create(&thrdIdM, NULL,&startThread, this);
+    assert(!started_);
+    started_ = true;
+    pthread_create(&thrdId_, NULL,&StartThread, this);
 }
 
-void Thread::join()
+void Thread::Join()
 {
-    assert(startedM);
-    pthread_join(thrdIdM,NULL);   
+    assert(started_);
+    pthread_join(thrdId_,NULL);   
 }
 
-void* Thread::startThread(void *arg)
+void* Thread::StartThread(void *arg)
 {
     Thread* thread = static_cast<Thread*>(arg);
     thread->run();
     return NULL;    
 }
 
-void Thread::run()
+void Thread::Run()
 {
-    pidM = CurrentThread::tid();
-    ACache::CurrentThread::t_name = nameM.c_str();
-    funcM();
-    ACache::CurrentThread::t_name = "finished";
+    pid_ = CurrentThread::tid();
+    BaseLib::CurrentThread::t_name = name_.c_str();
+    func_();
+    BaseLib::CurrentThread::t_name = "finished";
 }
 
 
