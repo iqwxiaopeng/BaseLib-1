@@ -3,59 +3,59 @@
 #include <boost/noncopyable.hpp>
 #include <pthread.h>
 
-namespace ACache
+namespace BaseLib
 {
 class Mutex:boost::noncopyable
 {
 public:
     Mutex()
     {
-        pthread_mutex_init(&mutexM,NULL);
+        pthread_mutex_init(&mutex_,NULL);
     }
 
     ~Mutex()
     {
-        pthread_mutex_destroy(&mutexM);
+        pthread_mutex_destroy(&mutex_);
     }
 
     void lock()
     {
-        pthread_mutex_lock(&mutexM);
+        pthread_mutex_lock(&mutex_);
     }
     
     void unlock()
     {
-        pthread_mutex_unlock(&mutexM);
+        pthread_mutex_unlock(&mutex_);
     }
 
     void trylock()
     {
-        pthread_mutex_trylock(&mutexM);
+        pthread_mutex_trylock(&mutex_);
     }
 
     pthread_mutex_t* getMutex()
     {
-        return &mutexM;
+        return &mutex_;
     }
 private:
-    pthread_mutex_t mutexM;
+    pthread_mutex_t mutex_;
 };
 
 class MutexGuard:boost::noncopyable
 {
 public:
-    explicit MutexGuard(Mutex& mutex):mtexM(mutex)
+    explicit MutexGuard(Mutex& mutex):mtex_(mutex)
     {
-        mtexM.lock();   
+        mtex_.lock();   
     }
 
     ~MutexGuard()
     {
-        mtexM.unlock();
+        mtex_.unlock();
     }
 
 private:
-    Mutex& mtexM;
+    Mutex& mtex_;
 };
 }
 #endif
