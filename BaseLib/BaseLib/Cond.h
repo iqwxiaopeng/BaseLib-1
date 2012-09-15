@@ -1,37 +1,37 @@
 #ifndef COND_H_
 #define COND_H_
 
-namespace ACache { 
+namespace BaseLib { 
 class Cond : boost::noncopyable
 {
 public:
     Cond()
     {
-        pthread_cond_init(&condM,NULL);
+        pthread_cond_init(&cond_,NULL);
     }
 
     ~Cond()
     {
-        pthread_cond_destroy(&condM);
+        pthread_cond_destroy(&cond_);
     }
 
-    void wait()
+    void Wait()
     {
-        pthread_cond_wait(&condM,mutexM.getMutex());  
+        pthread_cond_wait(&cond_,mutex_.GetMutex());  
     }
 
-    void signal()
+    void Signal()
     {
-        pthread_cond_signal(&condM);
+        pthread_cond_signal(&cond_);
     }   
   
-    void broadcast()
+    void Broadcast()
     {
-        pthread_cond_broadcast(&condM);
+        pthread_cond_broadcast(&cond_);
     }
 private:
-    Mutex& mutexM;
-    pthread_cond_t condM;
+    Mutex& mutex_;
+    pthread_cond_t cond_;
 };
 }//ACache
 #endif
